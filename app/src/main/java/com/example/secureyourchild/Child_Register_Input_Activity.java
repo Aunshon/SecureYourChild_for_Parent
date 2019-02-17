@@ -13,8 +13,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
@@ -23,10 +26,11 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
 
     FirebaseUser firebaseUser;
     FirebaseAuth firebaseAuth;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase,mdatabaseref;
     private String UserPhoneNumber,UID;
     SharedPreferences sharedPreferences;
     private String user_type="user_type";
+    String userPhoneOnFirebase,userNameOnFirebase,userAgeOnfirebase;
 
     EditText nameText,ageText;
     private String usernameText,userAgeText;
@@ -49,41 +53,66 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
             mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(mainint);
         }
-    }
-    public void GoBtnClicked(View view) {
-        UserPhoneNumber=firebaseUser.getPhoneNumber();
-        UID=firebaseUser.getUid();
 
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("Users").child(UID);
-        String device_token= FirebaseInstanceId.getInstance().getToken();
-        // complex data storing
-        HashMap<String, String> usermap=new HashMap<>();
-        usermap.put("phone",UserPhoneNumber);
-        usermap.put("name",nameText.getText().toString());
-        usermap.put("age",ageText.getText().toString());
-        usermap.put("uid",UID);
-        usermap.put("device_token",device_token);
-
-        usernameText=nameText.getText().toString();
-        userAgeText=ageText.getText().toString();
-        UserInfoClass userInfoClass=new UserInfoClass(UserPhoneNumber,usernameText,userAgeText,UID,device_token,sharedPreferences.getString(user_type,"null"));
-        //Toast.makeText(this, ""+userInfoClass.getUID(), Toast.LENGTH_SHORT).show();
-
-        mDatabase.setValue(userInfoClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+        mdatabaseref= FirebaseDatabase.getInstance().getReference("Users");
+        mdatabaseref.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
-                    Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
-                    mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(mainint);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+                    UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
+                    if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
+                        userPhoneOnFirebase=userData.getPhone();
+                        userNameOnFirebase=userData.getUsername();
+                        userAgeOnfirebase=userData.getAge();
+                    }
                 }
-                else {
-                    Toast.makeText(Child_Register_Input_Activity.this, ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(Child_Register_Input_Activity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
-//        firebaseAuth.signOut();
+
+    }
+
+    public void GoBtnClicked(View view) {
+        Toast.makeText(this, userPhoneOnFirebase+" "+userNameOnFirebase+" "+userAgeOnfirebase, Toast.LENGTH_SHORT).show();
+
+//        UserPhoneNumber=firebaseUser.getPhoneNumber();
+//        UID=firebaseUser.getUid();
+//
+//        mDatabase= FirebaseDatabase.getInstance().getReference().child("Users").child(UID);
+//        String device_token= FirebaseInstanceId.getInstance().getToken();
+//        // complex data storing
+//        HashMap<String, String> usermap=new HashMap<>();
+//        usermap.put("phone",UserPhoneNumber);
+//        usermap.put("name",nameText.getText().toString());
+//        usermap.put("age",ageText.getText().toString());
+//        usermap.put("uid",UID);
+//        usermap.put("device_token",device_token);
+//
+//        usernameText=nameText.getText().toString();
+//        userAgeText=ageText.getText().toString();
+//        UserInfoClass userInfoClass=new UserInfoClass(UserPhoneNumber,usernameText,userAgeText,UID,device_token,sharedPreferences.getString(user_type,"null"));
+//        //Toast.makeText(this, ""+userInfoClass.getUID(), Toast.LENGTH_SHORT).show();
+//
+//        mDatabase.setValue(userInfoClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                if (task.isSuccessful()){
+//                    Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
+//                    Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
+//                    mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(mainint);
+//                }
+//                else {
+//                    Toast.makeText(Child_Register_Input_Activity.this, ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//
+////        firebaseAuth.signOut();
     }
 }

@@ -13,6 +13,9 @@ public class UserInfoClass {
         this.user_type = user_type;
     }
 
+    public UserInfoClass() {
+    }
+
     public String getPhone() {
         return phone;
     }
