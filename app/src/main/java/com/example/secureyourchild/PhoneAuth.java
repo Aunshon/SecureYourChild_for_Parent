@@ -29,11 +29,12 @@ public class PhoneAuth extends AppCompatActivity {
     String fullPhoneNumber;
     EditText phoneNumber,VarifyCode;
     SharedPreferences sharedPreferences;
+    SharedPreferences.Editor sharedEditor;
     ProgressDialog progressDialog;
     FirebaseAuth mAuth;
     FirebaseUser firebaseUser;
 
-    private String user_type="user_type";
+    private String user_type="user_type",sharephonekey="phone";
     private String user;
     String SentCode;
 
@@ -57,6 +58,7 @@ public class PhoneAuth extends AppCompatActivity {
         firebaseUser=mAuth.getCurrentUser();
 
         sharedPreferences=getSharedPreferences(user_type,MODE_PRIVATE);
+        sharedEditor=sharedPreferences.edit();
 
         user=sharedPreferences.getString(user_type,"null");
 //        Toast.makeText(this, ""+user, Toast.LENGTH_SHORT).show();
@@ -128,6 +130,8 @@ public class PhoneAuth extends AppCompatActivity {
                             //here you can open new activity
                             progressDialog.dismiss();
                             if (sharedPreferences.getString(user_type,null)=="Child"){
+                                sharedEditor.putString(sharephonekey,fullPhoneNumber);
+                                sharedEditor.apply();
                                 Toast.makeText(PhoneAuth.this, "Login Successfull", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(PhoneAuth.this,Child_Register_Input_Activity.class));
                             }
@@ -143,9 +147,5 @@ public class PhoneAuth extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    public void aaa(View view) {
-        startActivity(new Intent(PhoneAuth.this,Child_Register_Input_Activity.class));
     }
 }

@@ -24,12 +24,12 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences.Editor sharedEditor;
     private DatabaseReference mdatabaseref;
     Spinner userSpinner;
-    private String user_type="user_type";
+    private String user_type="user_type",sharephonekey="phone",sharename="name",shareage="age";
     String userPhoneOnFirebase,userNameOnFirebase,userAgeOnfirebase;;
     private String signed_in_user;
     FirebaseAuth mAuth;
     FirebaseUser firebaseUser;
-    private String user,UserPhoneNumber=null;
+    private String user,PhoneNumber,userage,name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,35 +40,38 @@ public class MainActivity extends AppCompatActivity {
         firebaseUser=mAuth.getCurrentUser();
         sharedPreferences=getSharedPreferences(user_type,MODE_PRIVATE);
         user=sharedPreferences.getString(user_type,"null");
+        PhoneNumber=sharedPreferences.getString(sharephonekey,"null");
+        userage=sharedPreferences.getString(shareage,"null");
+        name=sharedPreferences.getString(sharename,"null");
 
         mdatabaseref= FirebaseDatabase.getInstance().getReference("Users");
-        if (firebaseUser!=null){
-            mdatabaseref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                        UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
-                        if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
-                            userPhoneOnFirebase=userData.getPhone();
-                            userNameOnFirebase=userData.getUsername();
-                            userAgeOnfirebase=userData.getAge();
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+//        if (firebaseUser!=null){
+//            mdatabaseref.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+//                        UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
+//                        if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
+//                            userPhoneOnFirebase=userData.getPhone();
+//                            userNameOnFirebase=userData.getUsername();
+//                            userAgeOnfirebase=userData.getAge();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                    Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (user!="null"){
                     if (firebaseUser!=null){
-                        if (userAgeOnfirebase!=null && userPhoneOnFirebase!=null && userNameOnFirebase!=null){
+                        if (userage!="null" && PhoneNumber!="null" && name!="null"){
                             Intent mainint = new Intent(MainActivity.this, ChildMapActivity.class);
                             mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(mainint);

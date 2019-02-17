@@ -85,11 +85,5 @@
                 android:onClick="varifyCodeBtn"
                 />
         </LinearLayout>
-        <Button
-            android:layout_width="300dp"
-            android:layout_height="60dp"
-            android:text="aaaa"
-            android:onClick="aaa"
-            />
     </LinearLayout>
 </LinearLayout>

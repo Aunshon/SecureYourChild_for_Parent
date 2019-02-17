@@ -29,8 +29,9 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
     private DatabaseReference mDatabase,mdatabaseref;
     private String UserPhoneNumber,UID;
     SharedPreferences sharedPreferences;
-    private String user_type="user_type";
-    String userPhoneOnFirebase,userNameOnFirebase,userAgeOnfirebase;
+    SharedPreferences.Editor sharedEditor;
+    private String user_type="user_type",sharename="name",shareage="age";
+    //String userPhoneOnFirebase,userNameOnFirebase,userAgeOnfirebase;
 
     EditText nameText,ageText;
     private String usernameText,userAgeText;
@@ -44,6 +45,7 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
         nameText=findViewById(R.id.NameEt);
         ageText=findViewById(R.id.AgeEt);
         sharedPreferences=getSharedPreferences(user_type,MODE_PRIVATE);
+        sharedEditor=sharedPreferences.edit();
 //        usernameText=nameText.getText().toString();
 //        userAgeText=ageText.getText().toString();
 
@@ -55,30 +57,30 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
         }
 
         mdatabaseref= FirebaseDatabase.getInstance().getReference("Users");
-        mdatabaseref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                    UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
-                    if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
-                        userPhoneOnFirebase=userData.getPhone();
-                        userNameOnFirebase=userData.getUsername();
-                        userAgeOnfirebase=userData.getAge();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(Child_Register_Input_Activity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        mdatabaseref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+//                    UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
+//                    if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
+//                        userPhoneOnFirebase=userData.getPhone();
+//                        userNameOnFirebase=userData.getUsername();
+//                        userAgeOnfirebase=userData.getAge();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                Toast.makeText(Child_Register_Input_Activity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
 
     }
 
     public void GoBtnClicked(View view) {
-        Toast.makeText(this, userPhoneOnFirebase+" "+userNameOnFirebase+" "+userAgeOnfirebase, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, userPhoneOnFirebase+" "+userNameOnFirebase+" "+userAgeOnfirebase, Toast.LENGTH_SHORT).show();
 
         UserPhoneNumber=firebaseUser.getPhoneNumber();
         UID=firebaseUser.getUid();
@@ -102,6 +104,9 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
+                    sharedEditor.putString(sharename,usernameText);
+                    sharedEditor.putString(shareage,userAgeText);
+                    sharedEditor.apply();
                     Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
                     Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
                     mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

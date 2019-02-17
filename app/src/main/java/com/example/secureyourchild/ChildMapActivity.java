@@ -1,6 +1,7 @@
 package com.example.secureyourchild;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -53,6 +54,8 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
     String child_location_refrence="All_Child_Location_GeoFire";
     FirebaseUser firebaseUser;
     FirebaseAuth firebaseAuth;
+    SharedPreferences.Editor sharedEditor;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,8 +159,9 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        currentmarker=mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.setTrafficEnabled(true);
     }
 
     @Override
@@ -196,12 +200,14 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
                     if (currentmarker!=null){
                         currentmarker.remove();
                         currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("Your Location"));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),11.0f));
+                        mMap.setTrafficEnabled(true);
+
 
                     }
                     else {
                         currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("you"));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),11.0f));
 
                     }
                     Log.d("EDMTDEV",String.format("Your location was changed : %f / %f ",latitude,longitude));
