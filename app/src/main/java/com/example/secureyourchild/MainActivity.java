@@ -42,24 +42,26 @@ public class MainActivity extends AppCompatActivity {
         user=sharedPreferences.getString(user_type,"null");
 
         mdatabaseref= FirebaseDatabase.getInstance().getReference("Users");
-        mdatabaseref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                    UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
-                    if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
-                        userPhoneOnFirebase=userData.getPhone();
-                        userNameOnFirebase=userData.getUsername();
-                        userAgeOnfirebase=userData.getAge();
+        if (firebaseUser!=null){
+            mdatabaseref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+                        UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
+                        if (firebaseUser.getPhoneNumber().equals(userData.getPhone())){
+                            userPhoneOnFirebase=userData.getPhone();
+                            userNameOnFirebase=userData.getUsername();
+                            userAgeOnfirebase=userData.getAge();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(MainActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         new Handler().postDelayed(new Runnable() {
             @Override

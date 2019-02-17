@@ -1,18 +1,26 @@
 package com.example.secureyourchild;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,6 +28,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -39,6 +50,9 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
     DatabaseReference ref;
     GeoFire geoFire;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    String child_location_refrence="All_Child_Location_GeoFire";
+    FirebaseUser firebaseUser;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +63,83 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        ref= FirebaseDatabase.getInstance().getReference("Location_Geo_Fire");
+        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseUser=firebaseAuth.getCurrentUser();
+        ref= FirebaseDatabase.getInstance().getReference(child_location_refrence);
         geoFire=new GeoFire(ref);
+        setUpLocation();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case MY_PERMISSTION_REQUESR_CODE:
+                if (grantResults.length<0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    if (checkPlayservice()){
+                        builtGoogleApiCliect();
+                        createLocatinoRequest();
+                        DisplayLocation();
+                    }
+                }
+                break;
+        }
+    }
+    private void createLocatinoRequest() {
+        mlocationRequest=new LocationRequest();
+        mlocationRequest.setInterval(UPDATE_INTERVAL);
+        mlocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mlocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mlocationRequest.setSmallestDisplacement(Displacement);
+    }
+
+    private void builtGoogleApiCliect() {
+        mgoogleApiClient=new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mgoogleApiClient.connect();
+    }
+    private boolean checkPlayservice() {
+        int resultcode= GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (resultcode!= ConnectionResult.SUCCESS){
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultcode)){
+                GooglePlayServicesUtil.getErrorDialog(resultcode,this,PLAY_SERVICE_RESOLUTION_REQUEST).show();
+            }
+            else {
+                Toast.makeText(this, "This Device Is Not Supported 😭", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+    private void setUpLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            //Request runtime permission
+            ActivityCompat.requestPermissions(this,new String[]{
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            },MY_PERMISSTION_REQUESR_CODE);
+        }
+        else{
+            if (checkPlayservice()){
+                builtGoogleApiCliect();
+                createLocatinoRequest();
+                DisplayLocation();
+            }
+        }
+    }
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+//        locationCallback=new LocationCallback();
+        LocationServices.FusedLocationApi.requestLocationUpdates(mgoogleApiClient,mlocationRequest,this);
+//        fusedLocationProviderClient.requestLocationUpdates(mlocationRequest,locationCallback,null);
+    }
 
     /**
      * Manipulates the map once available.
@@ -75,12 +162,13 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        DisplayLocation();
+        startLocationUpdates();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        mgoogleApiClient.connect();
     }
 
     @Override
@@ -90,6 +178,40 @@ public class ChildMapActivity extends FragmentActivity implements OnMapReadyCall
 
     @Override
     public void onLocationChanged(Location location) {
+        lastlocation=location;
+        DisplayLocation();
+    }
+    private void DisplayLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        lastlocation= LocationServices.FusedLocationApi.getLastLocation(mgoogleApiClient);
+        if (lastlocation!=null){
+            final double latitude=lastlocation.getLatitude();
+            final double longitude=lastlocation.getLongitude();
+            geoFire.setLocation(firebaseUser.getUid(), new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                    if (currentmarker!=null){
+                        currentmarker.remove();
+                        currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("Your Location"));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+
+                    }
+                    else {
+                        currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("you"));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+
+                    }
+                    Log.d("EDMTDEV",String.format("Your location was changed : %f / %f ",latitude,longitude));
+                }
+            });
+
+        }
+        else {
+            Log.d("EDMTDEV","Can not get Location");
+        }
 
     }
 }
