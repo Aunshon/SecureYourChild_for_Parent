@@ -80,44 +80,42 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
     }
 
     public void GoBtnClicked(View view) {
-//        Toast.makeText(this, userPhoneOnFirebase+" "+userNameOnFirebase+" "+userAgeOnfirebase, Toast.LENGTH_SHORT).show();
+        if (nameText.getText().toString().isEmpty()){
+            nameText.setError("Please Enter Your Name");
+        }
+        else if (ageText.getText().toString().isEmpty()){
+            ageText.setError("Please Enter Your Age");
+        }
+        else {
+            UserPhoneNumber=firebaseUser.getPhoneNumber();
+            UID=firebaseUser.getUid();
 
-        UserPhoneNumber=firebaseUser.getPhoneNumber();
-        UID=firebaseUser.getUid();
+            mDatabase= FirebaseDatabase.getInstance().getReference().child("Users").child(UID);
+            String device_token= FirebaseInstanceId.getInstance().getToken();
 
-        mDatabase= FirebaseDatabase.getInstance().getReference().child("Users").child(UID);
-        String device_token= FirebaseInstanceId.getInstance().getToken();
-        // complex data storing
-        HashMap<String, String> usermap=new HashMap<>();
-        usermap.put("phone",UserPhoneNumber);
-        usermap.put("name",nameText.getText().toString());
-        usermap.put("age",ageText.getText().toString());
-        usermap.put("uid",UID);
-        usermap.put("device_token",device_token);
+            usernameText=nameText.getText().toString();
+            userAgeText=ageText.getText().toString();
+            UserInfoClass userInfoClass=new UserInfoClass(UserPhoneNumber,usernameText,userAgeText,UID,device_token,sharedPreferences.getString(user_type,"null"));
+            //Toast.makeText(this, ""+userInfoClass.getUID(), Toast.LENGTH_SHORT).show();
 
-        usernameText=nameText.getText().toString();
-        userAgeText=ageText.getText().toString();
-        UserInfoClass userInfoClass=new UserInfoClass(UserPhoneNumber,usernameText,userAgeText,UID,device_token,sharedPreferences.getString(user_type,"null"));
-        //Toast.makeText(this, ""+userInfoClass.getUID(), Toast.LENGTH_SHORT).show();
-
-        mDatabase.setValue(userInfoClass).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    sharedEditor.putString(sharename,usernameText);
-                    sharedEditor.putString(shareage,userAgeText);
-                    sharedEditor.apply();
-                    Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
-                    Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
-                    mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(mainint);
+            mDatabase.setValue(userInfoClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        sharedEditor.putString(sharename,usernameText);
+                        sharedEditor.putString(shareage,userAgeText);
+                        sharedEditor.apply();
+                        Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
+                        Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
+                        mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(mainint);
+                    }
+                    else {
+                        Toast.makeText(Child_Register_Input_Activity.this, ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }
-                else {
-                    Toast.makeText(Child_Register_Input_Activity.this, ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+            });
+        }
 
-//        firebaseAuth.signOut();
     }
 }
