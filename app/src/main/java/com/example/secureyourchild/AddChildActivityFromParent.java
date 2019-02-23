@@ -1,6 +1,5 @@
 package com.example.secureyourchild;
 
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,7 +19,7 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-public class AddPatentActivityFromChild extends AppCompatActivity {
+public class AddChildActivityFromParent extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -29,7 +28,7 @@ public class AddPatentActivityFromChild extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_patent_from_child);
+        setContentView(R.layout.activity_add_child_from_parent);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -57,13 +56,13 @@ public class AddPatentActivityFromChild extends AppCompatActivity {
 
     }
 
+
     public static class PlaceholderFragment extends Fragment {
 
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
         }
-
 
         public static PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
@@ -76,13 +75,12 @@ public class AddPatentActivityFromChild extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_add_patent_activity_from_child, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_add_child_activity_from_parent, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
     }
-
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -95,10 +93,10 @@ public class AddPatentActivityFromChild extends AppCompatActivity {
             Fragment fragment=null;
             switch (position){
                 case 0:
-                    fragment=new AddParentByQr();
+                    fragment=new AddChildByQr();
                     break;
                 case 1:
-                    fragment=new AddParentMenually();
+                    fragment=new AddChildMenually();
                     break;
             }
             return fragment;
@@ -108,18 +106,6 @@ public class AddPatentActivityFromChild extends AppCompatActivity {
         public int getCount() {
             // Show 3 total pages.
             return 2;
-        }
-
-        @Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0:
-                    return "Scan Qr";
-                case 1:
-                    return "Add Munualy";
-            }
-            return null;
         }
     }
 }

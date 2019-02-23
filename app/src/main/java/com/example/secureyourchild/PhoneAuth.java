@@ -62,7 +62,7 @@ public class PhoneAuth extends AppCompatActivity {
 
         user=sharedPreferences.getString(user_type,"null");
 //        Toast.makeText(this, ""+user, Toast.LENGTH_SHORT).show();
-        if (user=="null" && firebaseUser!=null){
+        if (user!="null" && firebaseUser!=null){
             Intent mainint=new Intent(PhoneAuth.this,Child_Register_Input_Activity.class);
             mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(mainint);
@@ -129,14 +129,15 @@ public class PhoneAuth extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             //here you can open new activity
                             progressDialog.dismiss();
-                            if (sharedPreferences.getString(user_type,null)=="Child"){
+                            if (sharedPreferences.getString(user_type,null)=="Child" || sharedPreferences.getString(user_type,null)=="Parent"){
                                 sharedEditor.putString(sharephonekey,fullPhoneNumber);
                                 sharedEditor.apply();
-                                Toast.makeText(PhoneAuth.this, "Login Successfull", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PhoneAuth.this, "Login Successfull as "+sharedPreferences.getString(user_type,null), Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(PhoneAuth.this,Child_Register_Input_Activity.class));
                             }
                             else {
-                                Toast.makeText(PhoneAuth.this, "Parent", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(PhoneAuth.this, "Parent", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PhoneAuth.this, "You have to login as parent or child", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {

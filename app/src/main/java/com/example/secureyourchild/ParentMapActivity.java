@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -40,7 +42,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class ChildMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleMap mMap;
     public static final int MY_PERMISSTION_REQUESR_CODE=1996;
@@ -65,7 +67,7 @@ public class ChildMapActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_child_map);
+        setContentView(R.layout.activity_parent_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -77,7 +79,6 @@ public class ChildMapActivity extends AppCompatActivity implements OnMapReadyCal
         geoFire=new GeoFire(ref);
         setUpLocation();
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -150,7 +151,6 @@ public class ChildMapActivity extends AppCompatActivity implements OnMapReadyCal
         LocationServices.FusedLocationApi.requestLocationUpdates(mgoogleApiClient,mlocationRequest,this);
 //        fusedLocationProviderClient.requestLocationUpdates(mlocationRequest,locationCallback,null);
     }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -176,22 +176,29 @@ public class ChildMapActivity extends AppCompatActivity implements OnMapReadyCal
 //        currentmarker=mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 //        mMap.setTrafficEnabled(true);
-    }
 
+//        LatLng dengerusArea=new LatLng(37.65,-122.077);
+//        mMap.addCircle(new CircleOptions()
+//                .center(dengerusArea)
+//                .radius(500)
+//                .strokeColor(Color.BLUE)
+//                .fillColor(0x220000FF)
+//                .strokeWidth(5.0f));
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater=getMenuInflater();
-        menuInflater.inflate(R.menu.child_map_menu,menu);
+        menuInflater.inflate(R.menu.parent_map_menu,menu);
         return true;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Change the map type based on the user's selection.
         switch (item.getItemId()) {
-            case R.id.map_parent_add_bychild:
+            case R.id.map_ChildAdd_byParent:
                 //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                //Toast.makeText(this, "Parent added", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(ChildMapActivity.this,AddPatentActivityFromChild.class));
+                //Toast.makeText(this, "Child added", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ParentMapActivity.this,AddChildActivityFromParent.class));
                 return true;
 
             default:
@@ -229,24 +236,19 @@ public class ChildMapActivity extends AppCompatActivity implements OnMapReadyCal
         if (lastlocation!=null){
             final double latitude=lastlocation.getLatitude();
             final double longitude=lastlocation.getLongitude();
-            geoFire.setLocation(firebaseUser.getUid(), new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
-                @Override
-                public void onComplete(String key, DatabaseError error) {
-                    if (currentmarker!=null){
-                        currentmarker.remove();
-                        currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("Your Location"));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
-                        mMap.setTrafficEnabled(true);
-                        mMap.getUiSettings().setZoomControlsEnabled(true);
-                    }
-                    else {
-                        currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("you"));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+            if (currentmarker!=null){
+                currentmarker.remove();
+                currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("Your Location"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+                mMap.setTrafficEnabled(true);
+                mMap.getUiSettings().setZoomControlsEnabled(true);
+            }
+            else {
+                currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("you"));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
 
-                    }
-                    Log.d("EDMTDEV",String.format("Your location was changed : %f / %f ",latitude,longitude));
-                }
-            });
+            }
+            Log.d("EDMTDEV",String.format("Your location was changed : %f / %f ",latitude,longitude));
 
         }
         else {

@@ -16,8 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".AddPatentActivityFromChild"
-            android:label="@string/title_activity_add_patent_from_child"
+            android:name=".AddChildActivityFromParent"
+            android:label="@string/title_activity_add_child_from_parent"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -31,6 +31,13 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name=".ParentMapActivity"
+            android:label="@string/title_activity_parent_map" />
+        <activity
+            android:name=".AddPatentActivityFromChild"
+            android:label="@string/title_activity_add_patent_from_child"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChildMapActivity"
             android:label="@string/title_activity_child_map" />

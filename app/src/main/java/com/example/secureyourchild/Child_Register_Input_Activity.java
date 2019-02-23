@@ -105,10 +105,19 @@ public class Child_Register_Input_Activity extends AppCompatActivity {
                         sharedEditor.putString(sharename,usernameText);
                         sharedEditor.putString(shareage,userAgeText);
                         sharedEditor.apply();
-                        Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
-                        Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
-                        mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(mainint);
+                        if (sharedPreferences.getString(user_type,null)=="Child"){
+                            Toast.makeText(Child_Register_Input_Activity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
+                            Intent mainint=new Intent(Child_Register_Input_Activity.this,ChildMapActivity.class);
+                            mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(mainint);
+                        }
+                        else {
+                            //Toast.makeText(Child_Register_Input_Activity.this, "Parent Under Development at child_registration_input_activity", Toast.LENGTH_SHORT).show();
+                            Intent mainint = new Intent(Child_Register_Input_Activity.this, ParentMapActivity.class);
+                            mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(mainint);
+                        }
+
                     }
                     else {
                         Toast.makeText(Child_Register_Input_Activity.this, ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
