@@ -72,17 +72,23 @@ public class MainActivity extends AppCompatActivity {
                 if (user!="null"){
                     if (firebaseUser!=null){
                         if (userage!="null" && PhoneNumber!="null" && name!="null"){
-                            if (sharedPreferences.getString(user_type,null)=="Child"){
-                                Intent mainint = new Intent(MainActivity.this, ChildMapActivity.class);
-                                mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(mainint);
-                            }
-                            else {
-                                //Toast.makeText(MainActivity.this, "User DEV at MainActivity", Toast.LENGTH_SHORT).show();
-                                Intent mainint = new Intent(MainActivity.this, ParentMapActivity.class);
-                                mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(mainint);
-                            }
+//                            String us=sharedPreferences.getString(user_type,"null");
+//                            Toast.makeText(MainActivity.this, us, Toast.LENGTH_SHORT).show();
+//                            if (sharedPreferences.getString(user_type,"null")=="Child"){
+//                                Toast.makeText(MainActivity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
+//                                Intent mainint=new Intent(MainActivity.this,ChildMapActivity.class);
+//                                mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                startActivity(mainint);
+//                            }
+//                            if (sharedPreferences.getString(user_type,"null")=="Parent"){
+//                                Toast.makeText(MainActivity.this, "Registration Successful 👏", Toast.LENGTH_SHORT).show();
+//                                Intent mainint=new Intent(MainActivity.this,ParentMapActivity.class);
+//                                mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                startActivity(mainint);
+//                            }
+                            Intent mainint = new Intent(MainActivity.this, ParentMapActivity.class);
+                            mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(mainint);
                         }
                         else {
                             Intent mainint = new Intent(MainActivity.this, Child_Register_Input_Activity.class);

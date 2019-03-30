@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Secure Your Child</string>
+    <string name="app_name">SYC-Parent</string>
     <string name="title_activity_child_map">Map</string>
     <string name="title_activity_add_patent_from_child">AddPatentActivityFromChild</string>
     <string name="tab_text_1">Tab 1</string>

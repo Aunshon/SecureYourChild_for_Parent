@@ -38,8 +38,8 @@ public class UserTypeActivity extends AppCompatActivity {
 
         List<String> allUsers=new ArrayList<>();
         allUsers.add(0,"Choose User");
-        allUsers.add(1,"Child");
-        allUsers.add(2,"Parent");
+        allUsers.add(1,"Parent");
+        //allUsers.add(2,"Parent");
 
         ArrayAdapter<String> dataAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,allUsers);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

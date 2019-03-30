@@ -9,7 +9,6 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -20,6 +19,8 @@ import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,9 +39,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -54,11 +57,13 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
     private int UPDATE_INTERVAL=5000;
     private int FASTEST_INTERVAL=3000;
     private int Displacement=10;
-    Marker currentmarker;
+    private DatabaseReference addchildDatabase;
+    Marker currentmarker, childLocationMarker;
     DatabaseReference ref;
     GeoFire geoFire;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    String child_location_refrence="All_Child_Location_GeoFire";
+    String child_location_refrence="All_Child_Location_GeoFire",UID,CHILDID;
+    private String user_type="user_type",sharename="name",shareage="age",cid="cid";
     FirebaseUser firebaseUser;
     FirebaseAuth firebaseAuth;
     SharedPreferences.Editor sharedEditor;
@@ -73,6 +78,8 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        sharedPreferences=getSharedPreferences(user_type,MODE_PRIVATE);
+        sharedEditor=sharedPreferences.edit();
         firebaseAuth=FirebaseAuth.getInstance();
         firebaseUser=firebaseAuth.getCurrentUser();
         ref= FirebaseDatabase.getInstance().getReference(child_location_refrence);
@@ -88,6 +95,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
                     if (checkPlayservice()){
                         builtGoogleApiCliect();
                         createLocatinoRequest();
+                        mMap.clear();
                         DisplayLocation();
                     }
                 }
@@ -171,20 +179,62 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
             return;
         }
         mMap.setMyLocationEnabled(true);
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        currentmarker=mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//        mMap.setTrafficEnabled(true);
 
-//        LatLng dengerusArea=new LatLng(37.65,-122.077);
-//        mMap.addCircle(new CircleOptions()
-//                .center(dengerusArea)
-//                .radius(500)
-//                .strokeColor(Color.BLUE)
-//                .fillColor(0x220000FF)
-//                .strokeWidth(5.0f));
+        LatLng dengerusArea=new LatLng(37.65,-122.077);
+        mMap.addCircle(new CircleOptions()
+                .center(dengerusArea)
+                .radius(500)
+                .strokeColor(Color.BLUE)
+                .fillColor(0x220000FF)
+                .strokeWidth(5.0f));
+        //mMap.addMarker(new MarkerOptions().position(dengerusArea).title("Geofence"));
+        GeoQuery geoQuery=geoFire.queryAtLocation(new GeoLocation(dengerusArea.latitude,dengerusArea.longitude),0.5f);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                Toast.makeText(ParentMapActivity.this, "Entered", Toast.LENGTH_SHORT).show();
+                mMap.clear();
+                DisplayLocation();
+                CreateGeofince();
+//                if (childLocationMarker!=null){
+//                    childLocationMarker.remove();
+//                    mMap.clear();
+//                }
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                Toast.makeText(ParentMapActivity.this, "Exited", Toast.LENGTH_SHORT).show();
+                mMap.clear();
+                DisplayLocation();
+                CreateGeofince();
+//                if (childLocationMarker!=null){
+//                    childLocationMarker.remove();
+//                    mMap.clear();
+//                }
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+                Toast.makeText(ParentMapActivity.this, "Moving Inside Area", Toast.LENGTH_SHORT).show();
+                mMap.clear();
+                DisplayLocation();
+                CreateGeofince();
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
     }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater=getMenuInflater();
@@ -208,6 +258,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        mMap.clear();
         DisplayLocation();
         startLocationUpdates();
     }
@@ -225,6 +276,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onLocationChanged(Location location) {
         lastlocation=location;
+        mMap.clear();
         DisplayLocation();
     }
     private void DisplayLocation() {
@@ -242,6 +294,10 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
                 mMap.setTrafficEnabled(true);
                 mMap.getUiSettings().setZoomControlsEnabled(true);
+
+                setChildLocation();
+                CreateGeofince();
+                CreateGeofince();
             }
             else {
                 currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("you"));
@@ -255,6 +311,59 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
             Log.d("EDMTDEV","Can not get Location");
         }
 
+    }
+
+    private void setChildLocation() {
+        if (firebaseUser!=null){
+            UID=firebaseUser.getUid();
+            addchildDatabase=FirebaseDatabase.getInstance().getReference().child("added_child_by_parent").child(UID);
+            addchildDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (childLocationMarker!=null){
+                        childLocationMarker.remove();
+                    }
+                    for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+                        final ChildAddClass childAddClass=postSnapshot.getValue(ChildAddClass.class);
+                        //Toast.makeText(ParentMapActivity.this, childAddClass.getChildID()+" "+childAddClass.getChildName(), Toast.LENGTH_SHORT).show();
+                        geoFire.getLocation(childAddClass.getChildID(), new com.firebase.geofire.LocationCallback() {
+                            @Override
+                            public void onLocationResult(String key, GeoLocation location) {
+                                if (location!=null){
+                                    //Toast.makeText(ParentMapActivity.this, "lat "+location.latitude+" long "+location.longitude, Toast.LENGTH_SHORT).show();
+                                    LatLng s = new LatLng(location.latitude, location.longitude);
+                                    childLocationMarker =mMap.addMarker(new MarkerOptions().position(s).title(childAddClass.getChildName()));
+                                    //childLocationMarker =mMap.addMarker(new MarkerOptions().position(s).title(location.toString()));
+                                }
+                                else {
+                                    Toast.makeText(ParentMapActivity.this, "There is no location for key "+key, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Toast.makeText(ParentMapActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(ParentMapActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+    private void CreateGeofince() {
+        LatLng dengerusArea=new LatLng(37.65,-122.077);
+        mMap.addCircle(new CircleOptions()
+                .center(dengerusArea)
+                .radius(500)
+                .strokeColor(Color.BLUE)
+                .fillColor(0x220000FF)
+                .strokeWidth(5.0f));
+        //mMap.addMarker(new MarkerOptions().position(dengerusArea).title("Geofence"));
     }
 
 }
