@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.secureyourchild">
+
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -18,14 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".QrAndChildIdResult"
-                android:label="Child Id"
-            ></activity>
-        <activity android:name=".QrScannerActivity" />
-        <activity
-            android:name=".AddChildActivityFromParent"
-            android:label="@string/title_activity_add_child_from_parent"
-            android:theme="@style/AppTheme.NoActionBar" />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -39,6 +33,19 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".GeoFencePicker"
+            android:label="@string/title_activity_geo_fence_picker"></activity>
+        <activity android:name=".MyGeoFence" />
+        <activity android:name=".AllChild" />
+        <activity
+            android:name=".QrAndChildIdResult"
+            android:label="Child Id" />
+        <activity android:name=".QrScannerActivity" />
+        <activity
+            android:name=".AddChildActivityFromParent"
+            android:label="@string/title_activity_add_child_from_parent"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ParentMapActivity"
             android:label="Parent Map" />
         <activity
@@ -48,15 +55,15 @@
         <activity
             android:name=".ChildMapActivity"
             android:label="Child Map" />
-        <activity android:name=".PhoneAuth"
-            android:label="Parent Phone Auth"
-            />
-        <activity android:name=".Child_Register_Input_Activity"
-            android:label="Parent Registration"
-            />
-        <activity android:name=".UserTypeActivity"
-            android:label="Parent Type"
-            />
+        <activity
+            android:name=".PhoneAuth"
+            android:label="Parent Phone Auth" />
+        <activity
+            android:name=".Child_Register_Input_Activity"
+            android:label="Parent Registration" />
+        <activity
+            android:name=".UserTypeActivity"
+            android:label="Parent Type" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -4,4 +4,7 @@
     <item android:id="@+id/map_ChildAdd_byParent"
         android:title="Add Child"
         app:showAsAction="never"/>
+    <item android:id="@+id/mychild" android:title="All Child"></item>
+    <item android:id="@+id/GeoFences" android:title="My Geofence"></item>
+    <item android:id="@+id/signout" android:title="Sign Out"></item>
 </menu>
