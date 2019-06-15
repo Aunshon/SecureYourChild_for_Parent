@@ -3,6 +3,7 @@ package com.example.secureyourchild;
 import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -78,7 +80,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
     DatabaseReference ref;
     GeoFire geoFire;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    String child_location_refrence="All_Child_Location_GeoFire",UID,CHILDID;
+    String child_location_refrence="All_Child_Location_GeoFire",UID,CHILDID,user_type="user_type";
     private String latval="latval",lonval="lonval",latkey="latkey",lonkey="lonkey";
     FirebaseUser firebaseUser,user_data;
     FirebaseAuth firebaseAuth,mAuth;
@@ -169,7 +171,9 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
 
         sharedPreferences=getSharedPreferences(latval,MODE_PRIVATE);
+        sharedPreferences1=getSharedPreferences(user_type,MODE_PRIVATE);
         sharedEditor=sharedPreferences.edit();
+        sharedEditor1=sharedPreferences1.edit();
 //        sharedPreferences1=getSharedPreferences(lonval,MODE_PRIVATE);
 
 
@@ -469,10 +473,40 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
                 startActivity(new Intent(ParentMapActivity.this,AddChildActivityFromParent.class));
                 return true;
             case R.id.mychild:
-                Toast.makeText(this, "my child", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ParentMapActivity.this,AllChild.class));
                 return true;
             case R.id.GeoFences:
                 startActivity(new Intent(ParentMapActivity.this,GeoFencePicker.class));
+                return true;
+            case R.id.signout:
+
+                final AlertDialog.Builder alert=new AlertDialog.Builder(this);
+                alert.setTitle("Confirm...");
+                alert.setMessage("Are You Sure , You Want To SignOut 😭 ?");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mAuth.signOut();
+                        sharedEditor.clear();
+                        sharedEditor.apply();
+
+                        sharedEditor1.clear();
+                        sharedEditor1.apply();
+
+                        Intent mainint = new Intent(ParentMapActivity.this, MainActivity.class);
+                        mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(mainint);
+                    }
+                });
+                alert.setCancelable(true);
+                alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(ParentMapActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                alert.show();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
