@@ -269,7 +269,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
         mMap = googleMap;
         LatLng sydney = new LatLng(23.7545861, 90.3752816);
         currentmarker=mMap.addMarker(new MarkerOptions().position(sydney).title("Daffodil International University"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(23.7545861, 90.3752816), 12.0f));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(23.7545861, 90.3752816), 14.0f));
         mMap.setTrafficEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
@@ -316,7 +316,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
 //                                UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
                                 ChildAddClass userData=postSnapshot.getValue(ChildAddClass.class);
                                 if (key.equals(userData.getChildID())){
-                                Toast.makeText(ParentMapActivity.this, userData.getChildName(), Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(ParentMapActivity.this, userData.getChildName(), Toast.LENGTH_SHORT).show();
 
                                     notiifcation.setSmallIcon(R.drawable.logo);
                                     notiifcation.setTicker("ticker");
@@ -550,7 +550,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
             if (currentmarker!=null){
                 currentmarker.remove();
                 currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("Your Location"));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),14.0f));
                 mMap.setTrafficEnabled(true);
                 mMap.getUiSettings().setZoomControlsEnabled(true);
 
@@ -560,7 +560,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
             }
             else {
                 currentmarker=mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("you"));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),12.0f));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude),14.0f));
 
             }
             Log.d("EDMTDEV",String.format("Your location was changed : %f / %f ",latitude,longitude));
