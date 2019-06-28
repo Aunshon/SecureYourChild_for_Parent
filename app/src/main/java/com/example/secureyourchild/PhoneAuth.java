@@ -136,8 +136,20 @@ public class PhoneAuth extends AppCompatActivity {
                                 startActivity(new Intent(PhoneAuth.this,Child_Register_Input_Activity.class));
                             }
                             else {
+                                sharedEditor=sharedPreferences.edit();
+                                sharedEditor.putString(user_type,"Parent");
+                                sharedEditor.apply();
+
+                                sharedEditor.putString(sharephonekey,fullPhoneNumber);
+                                sharedEditor.apply();
+
                                 //Toast.makeText(PhoneAuth.this, "Parent", Toast.LENGTH_SHORT).show();
                                 Toast.makeText(PhoneAuth.this, "You have to login as parent or child", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(PhoneAuth.this, "Login Successfull as "+sharedPreferences.getString(user_type,null), Toast.LENGTH_SHORT).show();
+////                                startActivity(new Intent(PhoneAuth.this,Child_Register_Input_Activity.class));
+//                                Intent mainint = new Intent(PhoneAuth.this, Child_Register_Input_Activity.class);
+//                                mainint.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                startActivity(mainint);
                             }
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {

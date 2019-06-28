@@ -308,20 +308,21 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
 
 
                     UID=firebaseUser.getUid();
-                    cInfo=FirebaseDatabase.getInstance().getReference("Users");
+                    cInfo=FirebaseDatabase.getInstance().getReference().child("added_child_by_parent").child(UID);
                     cInfo.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             for (DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                                UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
-                                if (key.equals(userData.getUid())){
-//                                Toast.makeText(ParentMapActivity.this, userData.getUsername(), Toast.LENGTH_SHORT).show();
+//                                UserInfoClass userData=postSnapshot.getValue(UserInfoClass.class);
+                                ChildAddClass userData=postSnapshot.getValue(ChildAddClass.class);
+                                if (key.equals(userData.getChildID())){
+                                Toast.makeText(ParentMapActivity.this, userData.getChildName(), Toast.LENGTH_SHORT).show();
 
                                     notiifcation.setSmallIcon(R.drawable.logo);
                                     notiifcation.setTicker("ticker");
                                     notiifcation.setContentTitle("Child Entered in Geofence");
                                     latLngtoconvert=new LatLng(location.latitude,location.longitude);
-                                    notiifcation.setContentText(userData.getUsername()+" is now  in "+ConvertlatlongToPlace(latLngtoconvert)+" area");
+                                    notiifcation.setContentText(userData.getChildName()+" is now  in "+ConvertlatlongToPlace(latLngtoconvert)+" area");
                                     notiifcation.setWhen(System.currentTimeMillis());
                                     notiifcation.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
