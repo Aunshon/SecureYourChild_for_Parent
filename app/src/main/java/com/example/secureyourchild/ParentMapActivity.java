@@ -317,7 +317,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
                                 if (key.equals(userData.getUid())){
 //                                Toast.makeText(ParentMapActivity.this, userData.getUsername(), Toast.LENGTH_SHORT).show();
 
-                                    notiifcation.setSmallIcon(R.drawable.ic_launcher_background);
+                                    notiifcation.setSmallIcon(R.drawable.logo);
                                     notiifcation.setTicker("ticker");
                                     notiifcation.setContentTitle("Child Entered in Geofence");
                                     latLngtoconvert=new LatLng(location.latitude,location.longitude);
@@ -385,7 +385,7 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
                                 if (key.equals(userData.getUid())){
 //                                Toast.makeText(ParentMapActivity.this, userData.getUsername(), Toast.LENGTH_SHORT).show();
 
-                                    notiifcation.setSmallIcon(R.drawable.ic_launcher_background);
+                                    notiifcation.setSmallIcon(R.drawable.logo);
                                     notiifcation.setTicker("ticker");
                                     notiifcation.setContentTitle("Exited");
                                     notiifcation.setContentText(userData.getUsername()+" is Out of the area");
@@ -633,8 +633,8 @@ public class ParentMapActivity extends AppCompatActivity implements OnMapReadyCa
             mMap.addCircle(new CircleOptions()
                     .center(dengerusArea)
                     .radius(500)
-                    .strokeColor(Color.BLUE)
-                    .fillColor(0x220000FF)
+                    .strokeColor(Color.argb(50, 70,70,110))
+                    .fillColor(Color.argb(100, 150,150,190))
                     .strokeWidth(5.0f));
             //mMap.addMarker(new MarkerOptions().position(dengerusArea).title("Geofence"));
         }
